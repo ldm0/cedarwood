@@ -521,6 +521,17 @@ impl Cedar {
         self.common_prefix_predict_iter(key).map(Some).collect()
     }
 
+    /// To shrink the memory usage of the cedar.
+    pub fn shrink_to_fit(&mut self) {
+        self.capacity = self.size;
+        self.array.resize(self.capacity, Default::default());
+        self.array.shrink_to_fit();
+        self.n_infos.resize(self.capacity, Default::default());
+        self.n_infos.shrink_to_fit();
+        self.blocks.resize((self.capacity + 255) / 256, Block::new());
+        self.blocks.shrink_to_fit();
+    }
+
     // To get the cursor of the first leaf node starting by `from`
     fn begin(&self, mut from: usize, mut p: usize) -> (Option<i32>, usize, usize) {
         let base = self.array[from].base();
